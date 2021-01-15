@@ -20,7 +20,7 @@ color_dic = {"white": (231, 234, 235),
              "black": (11, 12, 17)}
 
 max_size = 128
-pic = Image.open('test2.jpg')
+pic = Image.open('test.jpg')
 in_width = pic.width
 in_height = pic.height
 rate = max_size / max(pic.width, pic.height)
