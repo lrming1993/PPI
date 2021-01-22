@@ -12,6 +12,7 @@ path = "data/test1.txt"
 node_index_dict = {}
 all_nodes = []
 all_nodes_pointer = 0
+all_edges = []
 
 
 def add_node(n):
@@ -21,7 +22,6 @@ def add_node(n):
     all_nodes.append(temp)
     node_index_dict[n] = all_nodes_pointer
     all_nodes_pointer += 1
-
 
 
 def add_neighbor(n1, n2):
@@ -34,8 +34,10 @@ def add_neighbor(n1, n2):
 def add_neighbor_weighted(n1, n2, w):
     all_nodes[node_index_dict[n1]].neighbor.append(n2)
     all_nodes[node_index_dict[n1]].degree += 1
+    all_nodes[node_index_dict[n1]].weight += w
     all_nodes[node_index_dict[n2]].neighbor.append(n1)
     all_nodes[node_index_dict[n2]].degree += 1
+    all_nodes[node_index_dict[n2]].weight += w
 
 
 with open(path) as f1:
@@ -46,10 +48,12 @@ with open(path) as f1:
         n1 = i[0]
         n2 = i[1]
         w = i[2]
+        all_edges.append((n1, n2))
         if n1 not in node_index_dict:
             add_node(n1)
         if n2 not in node_index_dict:
             add_node(n2)
+        add_neighbor(n1, n2)
 
 # num_edge = 5
 # weight = [1, 2, 3, 4, 5]
