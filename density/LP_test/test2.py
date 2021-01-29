@@ -1,5 +1,6 @@
 from gurobipy import *
 
+
 class Node:
     def __init__(self):
         self.id = ""
@@ -11,6 +12,7 @@ class Node:
 path = "data/test1.txt"
 node_index_dict = {}
 all_nodes = []
+all_nodes_id = []
 all_nodes_pointer = 0
 all_edges = []
 
@@ -20,6 +22,7 @@ def add_node(n):
     temp = Node()
     temp.id = n
     all_nodes.append(temp)
+    all_nodes_id.append(n)
     node_index_dict[n] = all_nodes_pointer
     all_nodes_pointer += 1
 
@@ -55,7 +58,49 @@ with open(path) as f1:
             add_node(n2)
         add_neighbor(n1, n2)
 
-# num_edge = 5
+model_1 = Model("test1")
+variables_x_dict = {}
+variables_y_dict = {}
+node_list = []
+
+for n, i in enumerate(all_nodes_id):
+    variables_y_dict["{}".format(n)] = model_1.addVar(vtype=GRB.CONTINUOUS, lb=0, ub=1, name="y_{}".format(n))
+
+for n, i in enumerate(all_edges):
+    y1 = i[0]
+    y1_index = node_index_dict[y1]
+    y2 = i[1]
+    y2_index = node_index_dict[y2]
+    variables_x_dict["{}_{}".format(y1_index, y2_index)] = model_1.addVar(vtype=GRB.CONTINUOUS, lb=0, ub=1,
+                                                                          name="x{}_{}".format(y1_index, y2_index))
+    model_1.addConstr(variables_x_dict["{}_{}".format(y1_index, y2_index)] <= variables_y_dict["{}".format(y1_index)],
+                      "c{}_{}".format(n, 0))
+    model_1.addConstr(variables_x_dict["{}_{}".format(y1_index, y2_index)] <= variables_y_dict["{}".format(y2_index )],
+                      "c{}_{}".format(n, 1))
+
+variables_x_list = list(variables_x_dict[i] for i in variables_x_dict)
+variables_y_list = list(variables_y_dict[i] for i in variables_y_dict)
+
+
+model_1.addConstr(quicksum(variables_y_list) <= 1)
+
+model_1.setObjective(quicksum(variables_x_list), GRB.MAXIMIZE)
+
+model_1.optimize()
+
+print("Node and index:")
+for n, i in enumerate(all_nodes_id):
+    print("{}\t{}".format(i, n))
+
+print("\nNode profiles:")
+for v in model_1.getVars():
+    if v.varName[0] == "y":
+        print("{}, {}".format(v.varName, v.x))
+
+print("\nEdge profiles:")
+for v in model_1.getVars():
+    if v.varName[0] == "x":
+        print("{}, {}".format(v.varName, v.x))
 # weight = [1, 2, 3, 4, 5]
 """
 g1 = [0, 1, 2]
@@ -68,10 +113,8 @@ for i in g1:
 """
 
 # edges = [(0, 1), (1, 5), (5, 4), (4, 3), (3, 0), (3, 2), (2, 1)]
-
+'''
 edges = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3), (3, 4), (1, 4)]
-
-num_edge = len(edges)
 
 ###################
 model_1 = Model("test1")
@@ -112,6 +155,9 @@ for v in model_1.getVars():
     if v.varName[0] == "x":
         print("{}, {}".format(v.varName, v.x))
 ###################
+'''
+###############
+
 '''
 model_1 = Model("test1")
 variables_x = []

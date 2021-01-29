@@ -13,3 +13,6 @@ f	i	1	1
 g	h	1	1
 g	i	1	1
 h	i	1	1
+i   j   1   1
+g   j   1   1
+h   j   1   1
